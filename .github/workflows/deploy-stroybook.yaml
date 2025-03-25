@@ -1,0 +1,38 @@
+name: Build and Deploy Storybook to Storybook Branch
+
+on:
+  workflow_dispatch: # 버튼 클릭으로 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Prepare storybook branch
+        run: |
+          git config --global user.name "${{ secrets.GIT_USERNAME }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+          git fetch origin storybook || git checkout --orphan storybook
+          git switch storybook || git checkout -b storybook
+
+          # Remove all existing files
+          rm -rf ./*
+
+          # Copy new storybook build
+          cp -r storybook-static/* ./
+
+      - name: Commit and push to storybook branch
+        run: |
+          git add .
+          git commit -m "chore: deploy storybook from main 🚀" || echo "No changes to commit"
+          git push origin storybook --force
