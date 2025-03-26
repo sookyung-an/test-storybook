@@ -1,7 +1,7 @@
 name: Build and Deploy Storybook to Storybook Branch
 
 on:
-  workflow_dispatch: # 버튼 클릭으로 실행
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,18 +17,28 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
+      - name: Check storybook-static exists
+        run: |
+          if [ ! -d "storybook-static" ]; then
+            echo "❌ storybook-static not found. Storybook build might have failed."
+            exit 1
+          fi
+
       - name: Prepare storybook branch
         run: |
           git config --global user.name "${{ secrets.GIT_USERNAME }}"
           git config --global user.email "${{ secrets.GIT_EMAIL }}"
 
-          git fetch origin storybook || git checkout --orphan storybook
-          git switch storybook || git checkout -b storybook
+          git fetch origin
 
-          # Remove all existing files
-          rm -rf ./*
+          if git show-ref --quiet refs/remotes/origin/storybook; then
+            git switch storybook
+          else
+            git checkout --orphan storybook
+          fi
 
-          # Copy new storybook build
+          git rm -rf . > /dev/null 2>&1 || true
+
           cp -r storybook-static/* ./
 
       - name: Commit and push to storybook branch
