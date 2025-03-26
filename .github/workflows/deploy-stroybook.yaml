@@ -61,7 +61,19 @@ jobs:
       - name: Commit and push to storybook branch
         env:
           TOKEN: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+
         run: |
+          echo "✅ Merged PR #${PR_NUMBER} - \"${PR_TITLE}\""
+
           git add .
-          git commit -m "chore: deploy storybook from main 🚀" || echo "No changes to commit"
+          git commit -m "chore: deploy storybook from PR #${PR_NUMBER} - \"${PR_TITLE}\" 🚀" || echo "No changes to commit"
           git push origin storybook --force
+
+      - name: Leave PR Comment
+        env:
+          GH_TOKEN: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment $PR_NUMBER --body "✅ 이 PR은 병합되어 storybook 브랜치에 배포되었습니다! 🚀" --repo ${{ github.repository }}
