@@ -41,6 +41,10 @@ jobs:
 
           cp -r storybook-static/* ./
 
+          # 혹시 빌드된 폴더에 node_modules가 있을 경우 대비해 명시적으로 제거
+            rm -rf node_modules
+            git rm -r --cached node_modules || true
+
       - name: Commit and push to storybook branch
         env:
           TOKEN: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
