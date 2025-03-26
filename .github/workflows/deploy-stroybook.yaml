@@ -17,12 +17,15 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-      - name: Check storybook-static exists
+      - name: Copy storybook-static contents to root
         run: |
           if [ ! -d "storybook-static" ]; then
             echo "❌ storybook-static not found. Storybook build might have failed."
             exit 1
           fi
+
+          cp -a storybook-static/. ./
+          rm -rf storybook-static
 
       - name: Prepare storybook branch
         run: |
@@ -30,25 +33,16 @@ jobs:
           git config --global user.email "${{ secrets.GIT_EMAIL }}"
 
           git fetch origin
+          git clean -fd
 
           if git show-ref --quiet refs/remotes/origin/storybook; then
             git switch storybook
+            git pull origin storybook --rebase
           else
             git checkout --orphan storybook
           fi
 
           git rm -rf . > /dev/null 2>&1 || true
-
-          if [ -d "storybook-static" ]; then
-            cp -a storybook-static/. ./
-            rm -rf storybook-static
-          else
-            echo "❌ storybook-static directory not found. Cannot proceed."
-            exit 1
-          fi
-
-          rm -rf node_modules
-          git rm -r --cached node_modules || true
 
       - name: Commit and push to storybook branch
         env:
