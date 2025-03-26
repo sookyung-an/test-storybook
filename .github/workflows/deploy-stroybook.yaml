@@ -43,6 +43,7 @@ jobs:
           fi
 
           git rm -rf . > /dev/null 2>&1 || true
+          echo "node_modules/" >> .gitignore
 
       - name: Commit and push to storybook branch
         env:
