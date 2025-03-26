@@ -73,7 +73,7 @@ jobs:
 
       - name: Leave PR Comment
         env:
-          GH_TOKEN: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+          TOKEN: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           gh pr comment $PR_NUMBER --body "✅ 이 PR은 병합되어 storybook 브랜치에 배포되었습니다! 🚀" --repo ${{ github.repository }}
