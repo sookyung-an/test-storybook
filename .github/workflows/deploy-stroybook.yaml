@@ -39,11 +39,8 @@ jobs:
 
           git rm -rf . > /dev/null 2>&1 || true
 
-          # 복사 + 삭제
-          cp -a storybook-static/. ./
-          rm -rf storybook-static
+          cp -a storybook-static/* ./
 
-          # 혹시 빌드된 폴더에 node_modules가 있을 경우 대비해 명시적으로 제거
           rm -rf node_modules
           git rm -r --cached node_modules || true
 
