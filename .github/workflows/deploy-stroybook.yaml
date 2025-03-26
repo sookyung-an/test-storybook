@@ -2,11 +2,18 @@ name: Build and Deploy Storybook to Storybook Branch
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [closed]
 
 jobs:
   deploy:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.pull_request.merged == true &&
+        contains(join(github.event.pull_request.labels.*.name, ','), 'storybook')
+      )
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
