@@ -39,7 +39,13 @@ jobs:
 
           git rm -rf . > /dev/null 2>&1 || true
 
-          cp -a storybook-static/* ./
+          if [ -d "storybook-static" ]; then
+            cp -a storybook-static/. ./
+            rm -rf storybook-static
+          else
+            echo "❌ storybook-static directory not found. Cannot proceed."
+            exit 1
+          fi
 
           rm -rf node_modules
           git rm -r --cached node_modules || true
