@@ -40,8 +40,14 @@ jobs:
             git checkout --orphan storybook
           fi
 
+          # 기존 파일 모두 제거
           git rm -rf . > /dev/null 2>&1 || true
+
+          # 빌드 결과 복사
           cp -a /tmp/storybook-static/. ./
+
+          # tmp 정리
+          rm -rf /tmp/storybook-static
 
           echo "node_modules/" >> .gitignore
 
