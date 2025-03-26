@@ -17,15 +17,13 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-      - name: Copy storybook-static contents to root
+      - name: Backup storybook-static to tmp
         run: |
           if [ ! -d "storybook-static" ]; then
             echo "❌ storybook-static not found. Storybook build might have failed."
             exit 1
           fi
-
-          cp -a storybook-static/. ./
-          rm -rf storybook-static
+          cp -a storybook-static/. /tmp/storybook-static
 
       - name: Prepare storybook branch
         run: |
@@ -43,6 +41,8 @@ jobs:
           fi
 
           git rm -rf . > /dev/null 2>&1 || true
+          cp -a /tmp/storybook-static/. ./
+
           echo "node_modules/" >> .gitignore
 
       - name: Commit and push to storybook branch
